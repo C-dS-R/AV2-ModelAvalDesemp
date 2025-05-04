@@ -1,16 +1,17 @@
 ##### Bibliotecas
+import numpy as np
+import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
 
 ##### DADOS
 dados = pd.read_csv('dataset_5.csv', sep=',', encoding='latin1') # LEITURA
-dados_dropped = dados.dropna() # cópia dos dados sem NAs
-labels_colunas = dados.columns.values.tolist() #['cpu_cores', 'ram_gb', 'latencia_ms', 'armazenamento_tb', 'sistema_operacional', 'tipo_hd', 'tipo_processador', 'tempo_resposta']
+# colunas = dados.columns.values.tolist() #['cpu_cores', 'ram_gb', 'latencia_ms', 'armazenamento_tb', 'sistema_operacional', 'tipo_hd', 'tipo_processador', 'tempo_resposta']
 
 #########################################################
 ################## INICIO DAS QUESTÕES ##################
 #########################################################
-# Parte I – Análise Estatística:
+# Parte I - Análise Estatística:
 print('------Parte 1: Análise Estatística Inicial-------')
 # 1.Realize uma análise estatística inicial do conjunto de dados, obtendo medidas como média, mediana, mínimo, máximo, dentre outras medidas que julgue adequadas. Em seguida, interprete os resultados, comentando sobre a distribuição e as tendências centrais das variáveis.
 def p1_q1():
@@ -18,32 +19,32 @@ def p1_q1():
     #TODO: interpretação dos resultados, comentando sobre a distribuição e as tendências centrais das variáveis.
 # parte1_q1() #TODO: descomentar uma vez que finalizado
 
-# Parte II – Modelo e Diagnóstico
+# Parte II - Modelo e Diagnóstico
 print('\n\n\n------Parte 2: Modelo e Diagnóstico-------')
 #  2. Ajuste um modelo de regressão linear múltipla considerando:
 def p2_q2():
+    ### Dataframes isolados
     # Variável dependente: tempo_resposta
-    y = dados_dropped['tempo_resposta']
-    # Variáveis explicativas: demais variáveis
-    X = dados_dropped[labels_colunas].drop(columns=['tempo_resposta'])
+    y_df = dados[['tempo_resposta']].copy()
+    # Variáveis explicativas: demais variáveis ('cpu_cores', 'ram_gb', 'latencia_ms', 'armazenamento_tb')
+    X_df = dados[['cpu_cores', 'ram_gb', 'latencia_ms', 'armazenamento_tb','sistema_operacional', 'tipo_hd', 'tipo_processador']].copy()
 
-    # Obtem colunas categóricas ('sistema_operacional', 'tipo_hd', 'tipo_processador')
-    cols_categoricas = X.select_dtypes(include=['object']).columns.tolist()
+    #variaveis dummy
+    X_df = pd.get_dummies(X_df, columns=['sistema_operacional', 'tipo_hd', 'tipo_processador'], drop_first=True)
 
-    # Cria variaveis dummy para as colunas categóricas (obs: usa a 1a categoria como base)
-    X = pd.get_dummies(X, columns=cols_categoricas, drop_first=True)
+    #remove NAs
+    X_df = X_df.dropna()
+    y_df = y_df.dropna()
 
-    # Adiciona intercepto
-    X = sm.add_constant(X)
+    #alinha índices de y_df (endog) e X_df (exog)
+    y_df, X_df = y_df.align(X_df, join='inner', axis=0)
 
-    # Cria e treina o modelo
-    modelo = sm.OLS(y, X).fit()
+    #intercepto pra X
+    X_df = sm.add_constant(X_df)
 
-    # printa resumo dos resultados do modelo
-    print(modelo.summary())
+    #modelo
+    return sm.OLS(y_df, X_df, hasconst=True).fit()
 
-    #retorna o modelo
-    return modelo
 p2_q2() #TODO: descomentar uma vez que finalizado
 
 # 3. Informe (de acordo com as técnicas, abordagens e testes vistos em sala de aula):
@@ -62,7 +63,7 @@ p2_q2() #TODO: descomentar uma vez que finalizado
 #  ● Interprete os resultados.
 
 
-# Parte III – Análise Crítica
+# Parte III - Análise Crítica
 # 7. Compare dois modelos:
 #  ● Modelo 1: com todas as variáveis.
 #  ● Modelo 2: excluindo uma variável (ou variáveis). Explique o motivo da exclusão dessa variável.
