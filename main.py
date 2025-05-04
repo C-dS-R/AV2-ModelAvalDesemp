@@ -29,6 +29,8 @@ def p2_q2():
     # Variáveis explicativas: demais variáveis ('cpu_cores', 'ram_gb', 'latencia_ms', 'armazenamento_tb')
     X_df = dados[['cpu_cores', 'ram_gb', 'latencia_ms', 'armazenamento_tb','sistema_operacional', 'tipo_hd', 'tipo_processador']].copy()
 
+
+
     #variaveis dummy
     X_df = pd.get_dummies(X_df, columns=['sistema_operacional', 'tipo_hd', 'tipo_processador'], drop_first=True)
 
@@ -42,8 +44,14 @@ def p2_q2():
     #intercepto pra X
     X_df = sm.add_constant(X_df)
 
-    #modelo
-    return sm.OLS(y_df, X_df, hasconst=True).fit()
+    print(np.asarray(X_df).dtype) #verifica se o X_df é um array numpy
+
+
+    #cria e treina modelo
+    modelo = sm.OLS(y_df, X_df).fit()
+
+    modelo.summary() #mostra resultados
+    return modelo
 
 p2_q2() #TODO: descomentar uma vez que finalizado
 
