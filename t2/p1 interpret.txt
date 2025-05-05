@@ -1,0 +1,6 @@
+Tendência central: a média de tempo_resposta situa-se em torno de <média> ms, indicando …
+
+Dispersão: o desvio-padrão relativamente alto sugere …
+
+Assimetria: histogramas revelam leve cauda direita em tempo_resposta, logo transformações log podem ser testadas se necessário.
+
