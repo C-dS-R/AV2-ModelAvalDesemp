@@ -1,3 +1,4 @@
 *.pdf
 *.docx
 funcoes/parte1/__pycache__/estatisticas_iniciais.cpython-311.pyc
+/m
