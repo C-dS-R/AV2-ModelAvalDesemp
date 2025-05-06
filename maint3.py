@@ -3,11 +3,11 @@ from pathlib import Path
 import warnings
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import statsmodels.api as sm
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from statsmodels.stats.diagnostic import het_breuschpagan
-from statsmodels.graphics.regressionplots import influence_plot
+
+from funcoes.grafico_influencia import grafico_influencia
 
 warnings.filterwarnings("ignore")
 
@@ -17,20 +17,8 @@ pasta_output = Path("output")
 pasta_output.mkdir(exist_ok=True)
 arquivo_saida = pasta_output / "relatorio_output.txt"
 
-DEPENDENT_VAR    = "tempo_resposta"
 niv_significancia = 0.05 # nível de significância
 vif_threshold = 10 # threshold para multicolinearidade
-
-#funcoes aux
-def grafico_influencia(modelo, nome_imagem, pasta):
-    """Gera e salva influence plot (Cook's Distance)."""
-    caminho = pasta / nome_imagem
-
-    # Gera o gráfico de influência
-    fig = influence_plot(modelo, criterion="cooks")
-    fig.tight_layout()
-    fig.savefig(caminho, dpi=300)
-    plt.close(fig)
 
 def run_log_model(df_limpo: pd.DataFrame) -> sm.regression.linear_model.RegressionResultsWrapper:
     """
@@ -108,7 +96,7 @@ with arquivo_saida.open("w",encoding="utf-8") as f:
     #####PARTE 1
     f.write("\n\n--- PARTE 1 ---\n")
     f.write(f"\n--- Estatística descritiva (N={total_rows_final}) ---\n")
-    desc = df_limpo[num_cols+[DEPENDENT_VAR]].describe()
+    desc = df_limpo[num_cols+['tempo_resposta']].describe()
     f.write(desc.to_markdown())
 
     ######PARTE 2
@@ -194,8 +182,7 @@ with arquivo_saida.open("w",encoding="utf-8") as f:
     except Exception as exc:
         f.write(f"Erro ao ajustar modelo log: {exc}\n")
 
-    f.write("\n--- Fim da análise ---\n")
+    f.write("\n--- Análise concluída ---\n")
 
 # ----------------------------------------------------------------------------
-print(f"\nAnálise concluída. Relatório salvo em '{arquivo_saida}'.")
-print(f"Gráficos e influence plots no diretório '{pasta_output}/'.")
+print(f"\nAnálise concluída.")
