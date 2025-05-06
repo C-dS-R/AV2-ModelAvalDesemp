@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
 
+#alguns params
+niv_significancia = 0.05 # nível de significância
+vif_threshold = 10 # threshold para multicolinearidade (VIF)
+
+
 ##### DADOS
 dados = pd.read_csv('dataset_5.csv', sep=',', encoding='latin1') # LEITURA
 # colunas = dados.columns.values.tolist() #['cpu_cores', 'ram_gb', 'latencia_ms', 'armazenamento_tb', 'sistema_operacional', 'tipo_hd', 'tipo_processador', 'tempo_resposta']
