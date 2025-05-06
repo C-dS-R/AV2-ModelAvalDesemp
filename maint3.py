@@ -128,7 +128,7 @@ result_str += ("\n--- Análise concluída ---\n")
 
 # ----------------------------------------------------------------------------
 print(result_str) #mostra resultados
-#escreve resultados em arquivo
 
+#escreve resultados em arquivo
 with arquivo_relatorio_output.open("w", encoding="utf-8") as f:
     f.write(result_str)
