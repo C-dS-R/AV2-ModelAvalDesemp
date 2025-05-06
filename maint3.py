@@ -6,6 +6,7 @@ import statsmodels.api as sm
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from statsmodels.stats.diagnostic import het_breuschpagan
 
+# Minhas funções
 from funcoes.grafico_influencia import grafico_influencia
 from funcoes.run_log_model import run_log_model
 
