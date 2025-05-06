@@ -78,8 +78,7 @@ result_str += (f"\n--- Vars numéricas ---\n{num_cols}\n--- Vars categóricas --
 
 #####PARTE 1
 result_str += (f"\n\n--- PARTE 1 ---\n\n--- Estatística descritiva (N={quant_linhas_limpo}) ---\n")
-desc = df_limpo[num_cols+['tempo_resposta']].describe()
-result_str += (desc.to_markdown())
+result_str += df_limpo.describe().to_markdown()
 
 ######PARTE 2
 result_str += ("\n\n--- PARTE 2 ---\n\n--- Modelo ---\n")
