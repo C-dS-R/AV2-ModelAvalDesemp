@@ -51,12 +51,12 @@ result_str += df_limpo.describe().to_markdown()
 result_str += ("\n\n--- PARTE 2 ---\n\n--- Modelo 1 ---\n")
 
 # one-hot encoding
-X_cat = pd.DataFrame(index=df_limpo.index)
+X_categ_com_ohe = pd.DataFrame(index=df_limpo.index)
 
 X_numericas = df_limpo[cols_num]
-X_todas = pd.concat([X_numericas, X_cat], axis=1)
+X_todas = pd.concat([X_numericas, X_categ_com_ohe], axis=1) #junta as numericas com as categoricas apos one hot encoding
 X_todas_com_intercepto = sm.add_constant(X_todas, has_constant="add")
-y = df_limpo['tempo_resposta']
+y = df_limpo['tempo_resposta'] # variavel dependente
 
 
 #cria e treina o modelo
@@ -80,17 +80,16 @@ vif_df = pd.DataFrame(
 result_str += (vif_df.to_markdown(index=False)) + "\n"
 
 # Diagnóstico Breusch-Pagan
-result_str += ("--- Heterocedasticidade (Breusch-Pagan)\n")
-bp = het_breuschpagan(modelo.resid, X_todas_com_intercepto)
-for label, val in zip(["LM estatística","LM p-valor","F estatística","F p-valor"], bp):
-    result_str += (f"{label}: {val:.4f}\n")
+result_str += ("\n\n--- Teste de Heterocedasticidade de Breusch-Pagan\n")
+bp = het_breuschpagan(modelo.resid, X_todas_com_intercepto) #realiza teste
+
+#Mostra resultado do teste
 result_str += (
-    "Resultado: "
-    + (
-        "H0 rejeitada (heterocedasticidade)"
-        if bp[3] < .05 # .05 sendo o nivel de significancia
-        else "H0 aceita (homocedasticidade)"
-    )
+    f'Estatística Multiplicador Lagrange: {bp[0]:.4f}\n'
+    f'p-valor LM: {bp[1]:.4f}\n'
+    f'Estatística F: {bp[2]:.4f}\n'
+    f'p-valor F: {bp[3]:.4f}\n'
+    f'\nResultado: H0 {"rejeitada (Heterocedasticidade)" if bp[3] < .05 else "aceita (Homocedasticidade)"}\n\n'
 )
 
 
