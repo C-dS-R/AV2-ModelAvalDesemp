@@ -1,13 +1,13 @@
 # Bibliotecas
 from pathlib import Path
 import warnings
-import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from statsmodels.stats.diagnostic import het_breuschpagan
 
 from funcoes.grafico_influencia import grafico_influencia
+from funcoes.run_log_model import run_log_model
 
 
 warnings.filterwarnings("ignore") # para lidar com o erro do tipo do pandas
@@ -16,39 +16,6 @@ warnings.filterwarnings("ignore") # para lidar com o erro do tipo do pandas
 pasta_output = Path("output")
 pasta_output.mkdir(exist_ok=True)
 arquivo_relatorio_output = pasta_output / "relatorio_output.txt"
-
-#funcao aux
-def run_log_model(df_limpo: pd.DataFrame) -> sm.regression.linear_model.RegressionResultsWrapper:
-    """
-    Ajusta regressão OLS robusta: log(tempo_resposta) ~ Vars numéricas + dummies
-    Retorna o objeto de modelo já ajustado.
-    """
-    # Seleção de colunas
-    cols_categ = df_limpo.select_dtypes(include="object").columns.tolist()
-    cols_num   = (df_limpo.select_dtypes(include=["number", "bool"]).columns.difference(['tempo_resposta']).tolist())
-
-    # Observações com tempo_resposta positivo
-    df_valid = df_limpo[df_limpo['tempo_resposta'] > 0].copy()
-
-    # features e target
-    X_num = df_valid[cols_num]
-    X_dummies = pd.get_dummies(df_valid[cols_categ], drop_first=True)
-    X = pd.concat([X_num, X_dummies], axis=1)
-    y_log = np.log(df_valid['tempo_resposta'])
-
-    #adiciona intercepto no X
-    X = sm.add_constant(X, has_constant="add")
-
-    #treina modelo
-    modelo = sm.OLS(y_log, X).fit(cov_type="HC3")
-
-    #saidas
-    print("MODELO LOG")
-    print(modelo.summary()) #mostra resultados
-    grafico_influencia(modelo, "log_influencia.png", pasta_output)
-
-    return modelo
-
 
 #################################### INICIO ####################################
 
