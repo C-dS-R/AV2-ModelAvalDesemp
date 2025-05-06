@@ -22,9 +22,9 @@ niv_significancia = 0.05 # nível de significância
 vif_threshold = 10 # threshold para multicolinearidade
 
 #funcoes aux
-def plot_influence(modelo, nome_imagem):
+def grafico_influencia(modelo, nome_imagem, pasta):
     """Gera e salva influence plot (Cook's Distance)."""
-    caminho = pasta_output / nome_imagem
+    caminho = pasta / nome_imagem
 
     # Gera o gráfico de influência
     fig = influence_plot(modelo, criterion="cooks")
@@ -32,43 +32,43 @@ def plot_influence(modelo, nome_imagem):
     fig.savefig(caminho, dpi=300)
     plt.close(fig)
 
-def run_log_model(df_processado: pd.DataFrame) -> sm.regression.linear_model.RegressionResultsWrapper:
+def run_log_model(df_limpo: pd.DataFrame) -> sm.regression.linear_model.RegressionResultsWrapper:
     """
     Ajusta regressão OLS robusta: log(tempo_resposta) ~ variáveis numéricas + dummies
     Retorna o objeto de modelo já ajustado.
     """
     # Seleção de colunas
-    colunas_categoricas = df_processado.select_dtypes(include="object").columns.tolist()
-    colunas_numericas   = (
-        df_processado
+    cols_categ = df_limpo.select_dtypes(include="object").columns.tolist()
+    cols_num   = (
+        df_limpo
         .select_dtypes(include=["number", "bool"])
         .columns.difference(['tempo_resposta'])
         .tolist()
     )
 
     # Observações com tempo_resposta positivo
-    df_valid = df_processado[df_processado['tempo_resposta'] > 0].copy()
+    df_valid = df_limpo[df_limpo['tempo_resposta'] > 0].copy()
 
     # features
-    X_num = df_valid[colunas_numericas]
-    X_cat = pd.get_dummies(df_valid[colunas_categoricas], drop_first=True)
-    X = pd.concat([X_num, X_cat], axis=1)
+    X_num = df_valid[cols_num]
+    X_dummies = pd.get_dummies(df_valid[cols_categ], drop_first=True)
+    X = pd.concat([X_num, X_dummies], axis=1)
 
     #target
     y_log = np.log(df_valid['tempo_resposta'])
 
     #intercepto pra X
-    X_const = sm.add_constant(X, has_constant="add")
+    X_com_intercepto = sm.add_constant(X, has_constant="add")
 
     #treina modelo
-    modelo_log = sm.OLS(y_log, X_const).fit(cov_type="HC3")
+    modelo = sm.OLS(y_log, X_com_intercepto).fit(cov_type="HC3")
 
     #saidas
     print("MODELO LOG")
-    print(modelo_log.summary()) #mostra resultados
-    plot_influence(modelo_log, "influence_log.png")
+    print(modelo.summary()) #mostra resultados
+    grafico_influencia(modelo, "influence_log.png", pasta_output)
 
-    return modelo_log
+    return modelo
 
 
 #inicio script principal
@@ -130,7 +130,7 @@ with arquivo_saida.open("w",encoding="utf-8") as f:
 
     f.write(modelo1.summary().as_text()) #mostra resultados
     f.write("\n")
-    plot_influence(modelo1, "influence.png")
+    grafico_influencia(modelo1, "influence.png", pasta_output)
 
 
     # diagnostico VIF
