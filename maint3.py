@@ -15,7 +15,7 @@ warnings.filterwarnings("ignore") # para lidar com o erro do tipo do pandas
 # caminho de output
 pasta_output = Path("output")
 pasta_output.mkdir(exist_ok=True)
-arquivo_saida = pasta_output / "relatorio_output.txt"
+arquivo_relatorio_output = pasta_output / "relatorio_output.txt"
 
 #funcao aux
 def run_log_model(df_limpo: pd.DataFrame) -> sm.regression.linear_model.RegressionResultsWrapper:
@@ -163,5 +163,5 @@ result_str += ("\n--- Análise concluída ---\n")
 print(result_str) #mostra resultados
 #escreve resultados em arquivo
 
-with arquivo_saida.open("w", encoding="utf-8") as f:
+with arquivo_relatorio_output.open("w", encoding="utf-8") as f:
     f.write(result_str)
