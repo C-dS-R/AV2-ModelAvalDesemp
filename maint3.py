@@ -45,7 +45,7 @@ def run_log_model(df_limpo: pd.DataFrame) -> sm.regression.linear_model.Regressi
     #saidas
     print("MODELO LOG")
     print(modelo.summary()) #mostra resultados
-    grafico_influencia(modelo, "influence_log.png", pasta_output)
+    grafico_influencia(modelo, "log_influencia.png", pasta_output)
 
     return modelo
 
@@ -98,7 +98,7 @@ modelo = sm.OLS(y, X_todas_com_intercepto).fit(cov_type="HC3")
 result_str += (modelo.summary().as_text()) + "\n"
 
 #gera grafico de influencia
-grafico_influencia(modelo, "influence.png", pasta_output)
+grafico_influencia(modelo, 'graf_influencia.png', pasta_output)
 
 
 # diagnostico VIF
